@@ -1,13 +1,11 @@
 import numpy as np
 import tensorflow as tf
 
-
 from sklearn.metrics import f1_score, log_loss
-
 
 from reader import DataReader
 from processing import preprocess, loop_vector
-from model import SVCModel
+from svc_model import SVCModel
 
 
 AUTOTUNE = tf.data.AUTOTUNE
