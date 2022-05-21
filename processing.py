@@ -1,3 +1,4 @@
+import numpy as np
 import re
 import string
 import tensorflow as tf
@@ -18,7 +19,7 @@ def custom_standardization(input_data):
 
 @tf.autograph.experimental.do_not_convert
 def preprocess(loader):
-    sequence_length = 89
+    sequence_length = 90
 
     vectorize_layer = layers.TextVectorization(
         standardize=custom_standardization,
@@ -36,3 +37,20 @@ def preprocess(loader):
 
     loader_vec = loader.map(vectorize_text)
     return loader_vec
+
+
+def loop_vector(vec: np.array) -> np.array:
+    res = vec.copy()
+    zeros_num = len(res) - np.count_nonzero(res)
+    first_zero_idx = np.argmax(res == 0)
+    while zeros_num > 0 and np.count_nonzero(res[first_zero_idx:]) == 0:
+        nonzero_part = res[:-zeros_num]
+        part_to_replace_zeros_with = res[:zeros_num]
+        res = np.concatenate((nonzero_part, part_to_replace_zeros_with))
+        zeros_num = len(res) - np.count_nonzero(res)
+        first_zero_idx = np.argmax(res == 0)
+    return res
+
+
+if __name__ == "__main__":
+    print(loop_vector(np.array([1, 2, 3, 4, 0, 0, 0])))
